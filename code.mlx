@@ -1,0 +1,173 @@
+function InvadatoriiSpatiali
+    % fereastra jocului
+    fereastra = figure('Name', 'Invadatorii Spațiali', 'NumberTitle', 'off', ...
+                       'MenuBar', 'none', 'ToolBar', 'none', ...
+                       'Color', 'black', 'KeyPressFcn', @GestioneazaTasta, ...
+                       'CloseRequestFcn', @InchideJocul, ...
+                       'Position', [100, 100, 600, 400]);
+    
+    % configurare axa
+    axis([0 100 0 100]);
+    axis manual;
+    hold on;
+    set(gca, 'Color', 'black', 'XColor', 'none', 'YColor', 'none');
+
+    % cer cu stele
+    numarStele = 50;
+    for i = 1:numarStele
+        pozXStea = rand() * 100;
+        pozYStea = rand() * 100;
+        plot(pozXStea, pozYStea, 'w.', 'MarkerSize', randi([2, 4]));
+    end
+
+    % variabile 
+    latimeNava = 10;
+    inaltimeNava = 5;
+    pozXNava = 45;
+    vitezaGlont = 4;
+    glontActiv = false;
+    extraterestrii = [];
+    numarExtraterestrii = 16;
+    vitezaExtraterestrii = 0.1;
+    directie = 1; % 1 = dreapta, -1 = stânga
+    scor = 0;
+
+    % nava
+    nava = rectangle('Position', [pozXNava, 5, latimeNava, inaltimeNava], ...
+                     'FaceColor', [0.5, 0.5, 0.5]); % gri
+
+    % glonnt
+    glont = rectangle('Position', [-10, -10, 2, 5], 'FaceColor', 'yellow');
+
+    % extraterestrii
+    [extraterestrii, latimeExtraterestru, inaltimeExtraterestru] = ExtraterestriiVin();
+
+    % scorul
+    textScor = text(80, 95, ['Scor: ', num2str(scor)], 'Color', 'white', 'FontSize', 12);
+
+    % timer
+    temporizatorJoc = timer('ExecutionMode', 'fixedRate', 'Period', 0.01, ...
+                            'TimerFcn', @ActualizeazaJocul);
+    start(temporizatorJoc);
+
+    % taste
+    function GestioneazaTasta(~, eveniment)
+        switch eveniment.Key
+            case 'leftarrow'
+                pozXNava = max(0, pozXNava - 5);
+            case 'rightarrow'
+                pozXNava = min(100 - latimeNava, pozXNava + 5);
+            case 'space'
+                if ~glontActiv
+                    glontActiv = true;
+                    pozXGlont = pozXNava + latimeNava / 2 - 1;
+                    pozYGlont = 10;
+                    set(glont, 'Position', [pozXGlont, pozYGlont, 2, 5]);
+                end
+        end
+        set(nava, 'Position', [pozXNava, 5, latimeNava, inaltimeNava]);
+    end
+
+    % actualizarea jocului
+    function ActualizeazaJocul(~, ~)
+        % Actualizare glonț
+        if glontActiv
+            pozGlont = get(glont, 'Position');
+            pozGlont(2) = pozGlont(2) + vitezaGlont;
+            set(glont, 'Position', pozGlont);
+            if pozGlont(2) > 100
+                glontActiv = false;
+                set(glont, 'Position', [-10, -10, 2, 5]);
+            end
+        end
+
+        % glont-extraterestru
+        for i = 1:length(extraterestrii)
+            if isvalid(extraterestrii(i))
+                pozExtraterestru = get(extraterestrii(i), 'Position');
+                pozGlont = get(glont, 'Position');
+                if glontActiv && ...
+                   pozGlont(1) + pozGlont(3) >= pozExtraterestru(1) && ...
+                   pozGlont(1) <= pozExtraterestru(1) + latimeExtraterestru && ...
+                   pozGlont(2) + pozGlont(4) >= pozExtraterestru(2) && ...
+                   pozGlont(2) <= pozExtraterestru(2) + inaltimeExtraterestru
+                    delete(extraterestrii(i));
+                    extraterestrii(i) = [];
+                    glontActiv = false;
+                    set(glont, 'Position', [-10, -10, 2, 5]);
+                    scor = scor + 10;
+                    set(textScor, 'String', ['Scor: ', num2str(scor)]);
+                    break;
+                end
+            end
+        end
+
+        % locatie extraterestri
+        for i = 1:length(extraterestrii)
+            if isvalid(extraterestrii(i))
+                pozExtraterestru = get(extraterestrii(i), 'Position');
+                pozExtraterestru(1) = pozExtraterestru(1) + directie * vitezaExtraterestrii;
+                set(extraterestrii(i), 'Position', pozExtraterestru);
+
+                % marginea și deplasare în jos
+                if pozExtraterestru(1) <= 0 || pozExtraterestru(1) + latimeExtraterestru >= 100
+                    directie = -directie;
+                    for j = 1:length(extraterestrii)
+                        if isvalid(extraterestrii(j))
+                            poz = get(extraterestrii(j), 'Position');
+                            poz(2) = poz(2) - 5;
+                            set(extraterestrii(j), 'Position', poz);
+                        end
+                    end
+                    break;
+                end
+            end
+        end
+
+        % verificare la nava
+        for i = 1:length(extraterestrii)
+            if isvalid(extraterestrii(i))
+                pozExtraterestru = get(extraterestrii(i), 'Position');
+                if pozExtraterestru(2) <= 10
+                    stop(temporizatorJoc);
+                    msgbox('Joc Terminat!', 'Invadatorii Spațiali', 'modal');
+                    InchideJocul();
+                    return;
+                end
+            end
+        end
+
+        % verificare extraterestrii
+        if isempty(extraterestrii)
+            stop(temporizatorJoc);
+            msgbox('Ai câștigat!', 'Invadatorii Spațiali', 'modal');
+            InchideJocul();
+        end
+    end
+
+    % creare extraterestrii
+    function [extraterestrii, latimeExtraterestru, inaltimeExtraterestru] = ExtraterestriiVin()
+        extraterestrii = [];
+        latimeExtraterestru = 10;
+        inaltimeExtraterestru = 5;
+        randuri = 4;
+        coloane = 4; % Total 16 extratereștri (4x4)
+        for i = 1:randuri
+            for j = 1:coloane
+                pozXExtraterestru = (j-1) * (latimeExtraterestru + 5) + 20;
+                pozYExtraterestru = 80 - (i-1) * (inaltimeExtraterestru + 5);
+                extraterestrii = [extraterestrii, rectangle('Position', ...
+                    [pozXExtraterestru, pozYExtraterestru, latimeExtraterestru, inaltimeExtraterestru], ...
+                    'FaceColor', 'red')]; % Roșu pentru extratereștri
+            end
+        end
+    end
+
+    % inchiderea jocului
+    function InchideJocul(~, ~)
+        stop(temporizatorJoc);
+        delete(temporizatorJoc);
+        delete(fereastra);
+    end
+end
+
