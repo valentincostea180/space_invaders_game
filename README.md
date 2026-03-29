@@ -1,11 +1,30 @@
-Designed and implemented a 2D arcade-style shooter game in MATLAB, inspired by classic "Space Invaders" gameplay. The project demonstrates proficiency in event-driven programming, graphical user interface (GUI) design, and real-time game logic handling.
+## 🕹️ MATLAB 2D Arcade Shooter
 
-Created a custom game window and interactive UI using MATLAB’s figure and axes functions.
+A 2D arcade-style shooter game implemented in MATLAB, inspired by the classic Space Invaders. This project showcases event-driven programming, GUI design, and real-time game logic.
 
-Developed real-time game mechanics including player movement, shooting mechanics, and enemy behavior using timers and keyboard event callbacks.
+### 🎮 Features
+Player-controlled spaceship with movement and shooting mechanics
+Waves of enemies with dynamic behaviors
+Collision detection and score tracking
+Dynamic starfield background for a classic arcade feel
+Win/loss state management with proper game cleanup
+Modular and structured code using nested functions for clarity
 
-Designed dynamic background elements (e.g., randomized starfield) and modular components such as enemy wave generation, collision detection, and score tracking.
+### 🛠️ Implementation Highlights
+Custom Game Window & GUI: Used MATLAB figure and axes for interactive graphics
+Event-driven Programming: Handled keyboard input and timed updates with callbacks and timer objects
+Game Mechanics: Real-time enemy spawning, projectile handling, and collision detection
+Dynamic Components: Modularized enemy waves, scoring, and background animations
+Code Organization: Nested functions emulate object-like behavior for maintainability
 
-Managed game state transitions (win/loss conditions, score updates) and resource cleanup to ensure stable execution.
+### 📌 Usage
+Open game.m (or your main MATLAB file)
+Run the script
+Control the player ship with arrow keys and spacebar
+Destroy enemies to increase score while avoiding enemy fire
 
-Applied structured, object-like logic using nested functions to encapsulate game functionality and maintain code clarity.
+### 🔧 Skills Demonstrated
+Event-driven GUI programming in MATLAB
+Real-time game loop implementation
+Modular code design with nested functions
+Graphical visualization and animations
