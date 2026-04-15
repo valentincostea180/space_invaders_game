@@ -18,7 +18,7 @@ A 2D arcade-style shooter game implemented in MATLAB, inspired by the classic Sp
 * Code Organization: Nested functions emulate object-like behavior for maintainability
 
 ## 📌 Usage
-* Open game.m (or your main MATLAB file)
+* Open code.mlx
 * Run the script
 * Control the player ship with arrow keys and spacebar
 * Destroy enemies to increase score while avoiding enemy fire
